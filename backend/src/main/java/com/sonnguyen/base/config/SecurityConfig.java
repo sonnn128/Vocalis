@@ -27,11 +27,13 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(authorizeHttpRequest ->
                         authorizeHttpRequest.requestMatchers(
-                                        "/api/v1/auth/register"
-                                        , "/api/v1/auth/login"
-                                        , "/api/v1/auth/token"
-                                        , "/api/v1/users/**"
-                                        , "/api/v1/docs/**")
+                                        "/api/v1/auth/register",
+                                        "/api/v1/auth/login",
+                                        "/api/v1/auth/token",
+                                        "/api/v1/decks/public",
+                                        "/api/v1/docs/**",
+                                        "/swagger-ui/**",
+                                        "/v3/api-docs/**")
                                 .permitAll()
                                 .anyRequest()
                                 .authenticated()

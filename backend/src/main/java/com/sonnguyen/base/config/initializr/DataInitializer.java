@@ -35,7 +35,7 @@ public class DataInitializer implements ApplicationListener<ContextRefreshedEven
             userRole = new Role();
             userRole.setId("USER");
             userRole.setPermissions(new HashSet<>());
-            roleRepository.save(userRole);
+            userRole = roleRepository.save(userRole);
         }
 
         // Initialize ADMIN role
@@ -44,7 +44,7 @@ public class DataInitializer implements ApplicationListener<ContextRefreshedEven
             adminRole = new Role();
             adminRole.setId("ADMIN");
             adminRole.setPermissions(new HashSet<>());
-            roleRepository.save(adminRole);
+            adminRole = roleRepository.save(adminRole);
         }
 
         // Create default admin user if not exists
