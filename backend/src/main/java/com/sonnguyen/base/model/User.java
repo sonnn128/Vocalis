@@ -21,7 +21,15 @@ public class User {
     
     @Column(unique = true)
     private String username;
+    
+    @Column(unique = true)
+    private String email;
+    
     private String password;
+    
+    private String fullName;
+    
+    private String phone;
 
     @Enumerated(EnumType.STRING)
     private Gender gender;

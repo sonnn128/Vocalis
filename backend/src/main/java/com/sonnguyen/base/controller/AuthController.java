@@ -1,6 +1,7 @@
 package com.sonnguyen.base.controller;
 
 import com.sonnguyen.base.payload.request.AuthRequest;
+import com.sonnguyen.base.payload.request.RegisterRequest;
 import com.sonnguyen.base.payload.response.ApiResponse;
 import com.sonnguyen.base.service.AuthService;
 import jakarta.validation.Valid;
@@ -19,19 +20,20 @@ public class AuthController {
         return ResponseEntity.ok().body(
                 ApiResponse.builder()
                         .success(true)
-                        .message("login success")
+                        .message("Login successful")
                         .data(authService.login(authRequest.getUsername(), authRequest.getPassword()))
                         .build()
         );
     }
 
     @PostMapping("/register")
-    public ResponseEntity<?> register(@Valid @RequestBody AuthRequest authRequest) {
-        authService.register(authRequest.getUsername(), authRequest.getPassword());
+    public ResponseEntity<?> register(@Valid @RequestBody RegisterRequest registerRequest) {
+        var authResponse = authService.register(registerRequest);
         return ResponseEntity.ok().body(
                 ApiResponse.builder()
                         .success(true)
-                        .message("register success")
+                        .message("Registration successful")
+                        .data(authResponse)
                         .build()
         );
     }
