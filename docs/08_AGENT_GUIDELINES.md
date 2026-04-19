@@ -153,22 +153,115 @@ function DeckList() {
 
 ---
 
-## 5. Hướng dẫn Debugging và Error Handling
+## 7. Error Handling
 
-### 5.1. Khắc phục lỗi (Debugging)
-- Mọi exception ở Java cần được throw đúng loại (`ResourceNotFoundException`, `BusinessException`) và cần bắt ở `GlobalExceptionHandler` để trả về `BaseResponse` với `success: false`.
-- Dịch message lỗi sang **tiếng Việt thân thiện với người dùng** nếu đẩy về frontend.
-- Cố gắng chỉ ra nguyên nhân gốc rễ (root cause) dựa vào logs. Đề xuất giải pháp có tỷ lệ thành công cao nhất, KHÔNG đoán mò sửa lung tung.
+### 7.1. Backend Errors
 
-### 5.2. Frontend Error Handling
-- Bắt lỗi trong `try/catch` ở các call async hàm API.
-- Cảnh báo người dùng bằng các component `Toast` hoặc `Alert`.
+```java
+// Throw custom exceptions tại Service
+throw new ResourceNotFoundException("Deck", deckId);
+throw new BusinessException("Bộ từ vựng này không được public");
+throw new UnauthorizedException("Bạn không phải chủ sở hữu của bộ từ vựng này");
+
+// GlobalExceptionHandler sẽ tự động convert thành BaseResponse:
+{
+  "success": false,
+  "message": "Bộ từ vựng này không được public",
+  "data": null,
+  "error": "BUSINESS_ERROR"
+}
+```
+
+### 7.2. Frontend Errors
+
+```jsx
+// ✅ ĐÚNG: Toast cho mutations gọi qua Action
+try {
+  const res = await createDeck(data);
+  if (res.success) {
+    toast.success('Đã tạo thành công bộ từ vựng mới');
+  } else {
+    toast.error(res.message || 'Có lỗi xảy ra');
+  }
+} catch (error) {
+  // Lỗi throw từ interceptor như 500 server error
+  toast.error('Lỗi máy chủ, vui lòng thử lại');
+}
+```
 
 ---
 
-## 6. Liên hệ & Escalation
+## 8. Testing Guidelines
+
+### 8.1. Backend Tests (Ví dụ)
+
+```java
+// Unit test cho Service
+@ExtendWith(MockitoExtension.class)
+class DeckServiceTest {
+    @Mock
+    private DeckRepository deckRepository;
+    
+    @InjectMocks
+    private DeckServiceImpl deckService;
+    
+    @Test
+    void createDeck_Success() {
+        // Arrange
+        CreateDeckRequest request = new CreateDeckRequest("TOEIC 600", "Public");
+        when(deckRepository.save(any())).thenReturn(deck);
+        
+        // Act
+        DeckResponse result = deckService.createDeck(request);
+        
+        // Assert
+        assertThat(result.getTitle()).isEqualTo("TOEIC 600");
+    }
+}
+```
+
+---
+
+## 9. Checklist khi implement feature
+
+### 9.1. Trước khi code
+
+- [ ] Đọc yêu cầu trong `00_BUSINESS_REQUIREMENTS.md`
+- [ ] Xem thiết kế API trong `05_API_DESIGN.md`
+- [ ] Xem schema database trong `04_DATABASE_SCHEMA.md`
+- [ ] Feature có trong scope Phase hiện tại ở `06_DEVELOPMENT_PHASES.md` không?
+
+### 9.2. Backend checklist
+
+- [ ] Entity đúng với schema
+- [ ] DTO có validation annotations (`@Valid`, `@NotBlank`)
+- [ ] Service thực thi business logic, không để lộ ở Controller
+- [ ] Chủ chốt: Kiểm tra quyền (Authorization) tài nguyên sở hữu.
+- [ ] Controller chỉ bọc BaseResponse
+- [ ] Exception được handle đúng
+
+### 9.3. Frontend checklist
+
+- [ ] Component đúng folder structure
+- [ ] State management xử lý bằng React Context đúng
+- [ ] Quản lý error bằng Toast/Alert
+- [ ] Loading states đầy đủ trước khi call API hiển thị
+- [ ] Giao diện Responsive nếu cần thiết
+
+### 9.4. Sau khi code
+
+- [ ] Test trực tiếp API với Swagger/Postman
+- [ ] Test end-to-end trên UI Browser
+- [ ] Xóa bỏ các lệnh `console.log()` / `System.out.println()` không cần thiết
+- [ ] Code follows conventions
+
+---
+
+## 10. Liên hệ & Escalation
 
 Khi gặp yêu cầu không rõ ràng hoặc không có context:
 1. Đọc lại tài liệu trong thư mục `docs/`.
 2. Kiểm tra xem file cấu hình (`application.yml`, `.env`) có đang thiếu gì không.
 3. Nếu không chắc chắn, đặt câu hỏi làm rõ (clarifying question) với người dùng trước khi viết code rườm rà.
+
+> 💡 **Nguyên tắc vàng**: Khi không chắc chắn, hãy hỏi thay vì đoán và viết code đi lạc hướng.
