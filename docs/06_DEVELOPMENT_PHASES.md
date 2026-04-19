@@ -1,70 +1,178 @@
-# 📈 Vocalis - Development Phases
+# � Vocalis - Development Phases
 
-Quá trình phát triển dự án được chia làm nhiều **Phase** (Giai đoạn) với thứ tự ưu tiên rõ ràng. Agent và Developer **PHẢI** tuân thủ thứ tự này, không nhảy cóc sang tính năng của Phase sau khi Phase trước chưa hoàn thiện.
+## Tổng quan các giai đoạn
 
----
-
-## 🚀 Phase 0: System Setup & Architecture
-**Mục tiêu:** Thiết lập nền móng dự án, CI/CD cơ bản và cấu trúc thư mục.
-
-1. Khởi tạo Spring Boot Backend (Cấu hình Security, Exception Handler, Base Response).
-2. Khởi tạo React/Vite Frontend (Cấu hình Axios baseURL, Router cơ bản).
-3. Thiết lập Database (PostgreSQL/MySQL) và kiểm tra kết nối CSDL thành công.
-4. Cấu hình Docker & Docker Compose để run cả cụm phục vụ quá trình test.
-
----
-
-## 🔐 Phase 1: Authentication & User Management (Core MVP)
-**Mục tiêu:** Người dùng có thể đăng ký, đăng nhập và hệ thống nhận diện được user qua JWT. **Ưu tiên cao nhất**.
-
-1. Cấu hình Spring Security kết hợp JWT Filter ở Backend.
-2. Xây dựng API `/api/v1/auth/register` và `/api/v1/auth/login`.
-3. Xây dựng Frontend: Trang Đăng ký (RegisterPage), Trang Đăng nhập (LoginPage).
-4. Lưu trữ JWT Token ở client (localStorage/cookies) và setup Axios Interceptor tự động đính kèm token.
-5. Cập nhật Sidebar/Navbar hiển thị tên/avatar người dùng khi đã đăng nhập.
-
----
-
-## 🗂️ Phase 2: Deck & Flashcard Management (CRUD)
-**Mục tiêu:** Người dùng tự quản lý dữ liệu học tập cá nhân (Thêm/Sửa/Xóa bộ từ và thẻ từ).
-
-1. Backend: Xây dựng Entity, Repository, Service và Controller cho `Decks` và `Flashcards`. Đảm bảo user chỉ sửa/xóa được Deck của chính mình.
-2. Thiết kế API lấy danh sách Decks của user (`/api/v1/decks`).
-3. Frontend: Giao diện lưới (Grid/List) hiển thị các Decks ở Dashboard.
-4. Frontend: Giao diện tạo mới / chỉnh sửa Deck (Modal / Page).
-5. Frontend: Giao diện chi tiết Deck (Deck Detail) hiển thị danh sách Flashcards bên trong dạng bảng.
-6. Cung cấp form (Form validation với React Hook Form/Zod) để thêm nhanh một thẻ từ (Word, Meaning, IPA, Example) vào một Deck cụ thể.
+```text
+┌─────────────────────────────────────────────────────────────────────────┐
+│                        DEVELOPMENT ROADMAP  (VOCALIS)                    │
+├─────────────────────────────────────────────────────────────────────────┤
+│                                                                         │
+│  PHASE 0          PHASE 1           PHASE 2          PHASE 3/4         │
+│  [Setup]          [Auth & Core]     [Study Mode]     [Quizzes & Polish]│
+│                                                                         │
+│  ┌─────┐          ┌─────────┐       ┌──────────┐     ┌───────────┐     │
+│  │ 1w  │────────▶ │  2-3w   │─────▶ │  2-3w    │───▶ │  Ongoing  │     │
+│  └─────┘          └─────────┘       └──────────┘     └───────────┘     │
+│                                                                         │
+│  - Project setup  - Auth/JWT        - Flip Cards     - Quizzes UI      │
+│  - DB setup       - User Mgmt       - SRS Algo       - Charts/Stats    │
+│  - Boilerplate    - Decks CRUD      - Due filters    - Social Sharing  │
+│                   - Cards CRUD      - Progress logic - Audio/TTS       │
+│                                                                         │
+└─────────────────────────────────────────────────────────────────────────┘
+```
 
 ---
 
-## 🧠 Phase 3: Study Mode (Lật thẻ & Ôn tập)
-**Mục tiêu:** Tính năng cốt lõi giúp người dùng học tập và tương tác lật thẻ.
+## Phase 0: Project Setup (1 tuần)
 
-1. Frontend: Xây dựng Component `FlashcardItem` có hiệu ứng CSS (Flip Card 3D chuyển mặt trước/sau).
-2. Giao diện "Study Mode": Slider hiển thị từng thẻ một trong Deck. Người dùng nhấp để lật, sau đó đánh giá mức độ nhớ (VD: Nút "Nhớ" và nút "Quên").
-3. Backend: Xây dựng bảng `user_progress` để lưu trữ trạng thái học của thẻ (`NEW`, `LEARNING`, `MASTERED`).
-4. API `/api/v1/study/review`: Nhận kết quả đánh giá (Nhớ/Quên) và tính toán khoảng cách ngày lặp lại (Spaced Repetition - SRS cơ bản hoặc thuật toán tùy chỉnh).
-5. Load danh sách thẻ tới hạn ôn tập (DUE) trong ngày.
+### Mục tiêu
+Thiết lập nền móng dự án, CI/CD cơ bản và cấu trúc thư mục từ đầu.
+
+### Tasks
+
+#### 0.1. Backend Setup
+| Task | Priority | Estimated |
+|------|----------|-----------|
+| Khởi tạo Spring Boot project (Web, JPA, Security, PostgreSQL) | P0 | 2h |
+| Cấu hình database credentials & application.yml | P0 | 1h |
+| Xây dựng BaseResponse & GlobalExceptionHandler | P0 | 2h |
+| Setup JWT Utility classes | P0 | 2h |
+| Cấu hình CORS cho React Frontend | P0 | 1h |
+| Setup Swagger/OpenAPI | P1 | 1h |
+
+#### 0.2. Frontend Setup
+| Task | Priority | Estimated |
+|------|----------|-----------|
+| Khởi tạo React/Vite project | P0 | 1h |
+| Cài đặt Tailwind CSS / Router / Axios | P0 | 1h |
+| Setup folder structure (components, pages, services, contexts) | P0 | 1h |
+| Cấu hình tĩnh Axios (baseURL, interceptors cơ bản) | P0 | 2h |
+| Basic Layout UI (Navbar, Sidebar tĩnh) | P1 | 3h |
+
+#### 0.3. Environment & Tools
+| Task | Priority | Estimated |
+|------|----------|-----------|
+| Tạo `compose.yml` cho DB | P0 | 1h |
+| Viết README.md hướng dẫn setup local | P0 | 1h |
+
+### Deliverables
+- [ ] Backend chạy được và kết nối được Database.
+- [ ] Giao diện lỗi (`/swagger-ui/index.html`) hoạt động trơn tru.
+- [ ] Frontend chạy được và render được Layout Header/Sidebar.
 
 ---
 
-## 📊 Phase 4: Quizzes & Progress Tracking
-**Mục tiêu:** Bài kiểm tra nhỏ và báo cáo học tập tạo động lực.
+## Phase 1: Authentication & Content Management (2-3 tuần)
 
-1. Backend: Bổ sung API tự động random sinh ra câu hỏi trắc nghiệm (Quiz) từ danh sách Flashcard thuộc một Deck (VD: Đưa nghĩa tiếng Việt, chọn 4 đáp án tiếng Anh).
-2. Frontend: Trình làm bài kiểm tra (Quiz UI), chấm điểm trực tiếp.
-3. Trang Dashboard/Profile: Thống kê dạng biểu đồ (Số thẻ đã thuộc, số thẻ đang học, số ngày học liên tiếp - Streaks).
+### Mục tiêu
+Cốt lõi MVP: Người dùng có thể đăng nhập, tạo, sửa, xóa các bộ từ vựng và thẻ từ.
+
+### Sprint 1.1: Authentication
+| Task | Priority | Estimated |
+|------|----------|-----------|
+| [BE] Entities `User`, `UserRole` + Security Config | P0 | 3h |
+| [BE] API `/api/v1/auth/register` & `/api/v1/auth/login` | P0 | 4h |
+| [BE] API `/api/v1/auth/me` để lấy account info | P0 | 2h |
+| [FE] Giao diện RegisterPage & LoginPage | P0 | 4h |
+| [FE] AuthContext lưu info, Axios Token Interceptor | P0 | 3h |
+| [FE] Protected Route hạn chế truy cập | P0 | 2h |
+
+#### Deliverables
+- [ ] Đăng ký, đăng nhập lấy JWT thành công.
+- [ ] Truy cập URL cần Auth bị văng ra Login nếu chưa login.
+
+### Sprint 1.2: Deck & Flashcard CRUD
+| Task | Priority | Estimated |
+|------|----------|-----------|
+| [BE] Entities `Deck`, `Flashcard` + Repository | P0 | 4h |
+| [BE] Rest APIs CRUD cho `Decks` (Check quyền Owner) | P0 | 4h |
+| [BE] Rest APIs CRUD cho `Flashcards` | P0 | 4h |
+| [FE] Dashboard Page show danh sách Decks (Grid/List) | P0 | 6h |
+| [FE] Form (Modal) Create/Edit Deck | P0 | 3h |
+| [FE] Deck Detail Page & bảng chứa danh sách Flashcard | P0 | 6h |
+| [FE] Form Create/Edit Flashcard | P0 | 4h |
+
+#### Deliverables
+- [ ] User tự thao tác vòng đời đầy đủ của Deck & Flashcard của họ.
+- [ ] Validate đầu vào chính xác cả backend (JPA, @Valid) lẫn Frontend.
 
 ---
 
-## 🌟 Phase 5: Enhancement & Public Sharing (Tương lai)
-**Mục tiêu:** Cải tiến UX và mở rộng cộng đồng (Scope nâng cao, chỉ làm khi MVP từ Phase 1-4 ổn định).
+## Phase 2: Study Mode & Spaced Repetition (2-3 tuần)
 
-1. Tìm kiếm (Search) bộ từ vựng Public của người khác. Tính năng Clone/Bookmark.
-2. Tích hợp Audio phát âm (Text-to-Speech của trình duyệt hoặc sử dụng API Google TTS).
-3. Hỗ trợ import/export danh sách từ vựng bằng file Excel/CSV.
-4. Hỗ trợ hiển thị trên thiết bị di động (Responsive 100% Mobile UI) hoặc làm App (React Native).
+### Mục tiêu
+Tính năng học tập chính (Lật thẻ) và lưu vết tiến độ.
+
+### Sprint 2.1: Study Mode UI
+| Task | Priority | Estimated |
+|------|----------|-----------|
+| [FE] UI thành phần: `FlashcardItem` hiệu ứng CSS lật 3D | P0 | 4h |
+| [FE] Study/Review Interface hiển thị 1 thẻ chính giữa màn hình | P0 | 4h |
+| [FE] Các nút Action: Lật thẻ, Khó (Hard), Bình thường (Good), Dễ (Easy) | P0 | 3h |
+
+### Sprint 2.2: Tracking Progress & SRS Logic
+| Task | Priority | Estimated |
+|------|----------|-----------|
+| [BE] Entity `UserProgress` lưu trữ interval và next_review | P0 | 3h |
+| [BE] Logic API `/api/v1/study/review`: Tính ngày học (SM-2 basic) | P0 | 6h |
+| [BE] API `/api/v1/study/due`: Lấy danh sách thẻ tới hạn hôm nay | P0 | 4h |
+| [FE] Tích hợp call API lúc user bấm các nút Hành động (Hard/Easy) | P0 | 4h |
+| [FE] Lọc danh sách thẻ cho Study Mode từ list DUE | P0 | 3h |
+
+#### Deliverables
+- [ ] Lật thẻ CSS mượt mà.
+- [ ] Ôn tập theo khoảng thời gian thực tế tính toán bằng thuật toán.
+- [ ] Mỗi ngày hệ thống chỉ query ra các từ "tới hạn".
 
 ---
 
-> ⚠️ **Chú ý cho Agent:** Không implement các tính năng Phase 4, Phase 5 cho đến khi Phase 1, Phase 2, Phase 3 hoàn thành và chạy mượt mà. Đảm bảo Core (CRUD) luôn chạy đúng trước khi tối ưu thuật toán (SRS).
+## Phase 3: Quizzes & Analytics (1-2 tuần)
+
+### Mục tiêu
+Tạo động lực học tập bằng gamification và biểu đồ thống kê.
+
+### Tasks
+| Task | Priority | Estimated |
+|------|----------|-----------|
+| [BE] API Sinh random câu hỏi trắc nghiệm từ Deck | P1 | 6h |
+| [FE] UI làm bài đánh giá (Quiz), chấm điểm | P1 | 6h |
+| [BE] API Thống kê số thẻ mới, đang học, đã thuộc | P1 | 4h |
+| [FE] UI hiển thị Biểu đồ (Charts) ở màn hình Dashboard | P1 | 4h |
+
+#### Deliverables
+- [ ] Tính năng Quiz random hoạt động.
+- [ ] Biểu đồ thể hiện trực quan quá trình học.
+
+---
+
+## Phase 4: Public Sharing & Enhancement (Tương lai)
+
+### Mục tiêu
+Mở rộng chức năng cộng đồng và tiện ích người dùng. Không nằm trong cốt lõi MVP.
+
+### Tasks
+| Task | Priority |
+|------|----------|
+| [BE & FE] Tìm kiếm Decks có cờ `is_public` | P2 |
+| [BE & FE] Chức năng Clone Deck public về thư viện của User | P2 |
+| [FE] Tích hợp Browser SpeechSynthesis API (Text-to-Speech) đọc thẻ | P2 |
+| [BE] Thêm API Upload Avatar / Hình ảnh vào Deck/Flashcard | P2 |
+| [FE] Giao diện Reponsive tối ưu 100% Mobile (Bottom navigation) | P2 |
+
+---
+
+## Development Guidelines
+
+### Priority Levels
+| Level | Meaning |
+|-------|---------|
+| P0 | Must have - Bắt buộc để ra mắt (MVP) |
+| P1 | Should have - Cải thiện trải nghiệm tốt hơn |
+| P2 | Nice to have - Chỉ làm khi có dư dả plan và thời gian |
+
+### Code Review Checklist
+- [ ] Code tuân thủ theo `07_CODING_CONVENTIONS.md`.
+- [ ] Logic Authentication / Authorization được áp dụng chặt chẽ ở các Layer.
+- [ ] Các API đều bắt lỗi tốt, trả về format BaseResponse có tính thống nhất.
+- [ ] Tính thẩm mĩ Frontend gọn gàng, chia Component hợp lý, không viết dồn đống ở File Page.
