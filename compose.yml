@@ -1,20 +1,20 @@
 services:
   postgres:
     image: postgres:16.11
-    container_name: lineagehub-postgres
+    container_name: vocalis-postgres
     restart: unless-stopped
     ports:
       - "5432:5432"
     environment:
-      POSTGRES_DB: lineagehub
-      POSTGRES_USER: lineagehub
-      POSTGRES_PASSWORD: lineagehub123
+      POSTGRES_DB: vocalis
+      POSTGRES_USER: vocalis
+      POSTGRES_PASSWORD: vocalis123
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
-      - lineagehub-network
+      - vocalis-network
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U lineagehub"]
+      test: ["CMD-SHELL", "pg_isready -U vocalis"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -24,7 +24,7 @@ services:
   #   build:
   #     context: ./backend
   #     dockerfile: Dockerfile
-  #   container_name: lineagehub-backend
+  #   container_name: vocalis-backend
   #   restart: unless-stopped
   #   ports:
   #     - "8080:8080"
@@ -32,9 +32,9 @@ services:
   #     SPRING_PROFILES_ACTIVE: dev
   #     DB_HOST: postgres
   #     DB_PORT: 5432
-  #     DB_NAME: lineagehub
-  #     DB_USER: lineagehub
-  #     DB_PASSWORD: lineagehub123
+  #     DB_NAME: vocalis
+  #     DB_USER: vocalis
+  #     DB_PASSWORD: vocalis123
   #     JWT_SECRET: your-256-bit-secret-key-here
   #     UPLOAD_DIR: /app/uploads
   #   volumes:
@@ -43,14 +43,14 @@ services:
   #     postgres:
   #       condition: service_healthy
   #   networks:
-  #     - lineagehub-network
+  #     - vocalis-network
 
   # Frontend service (uncomment when ready)
   # frontend:
   #   build:
   #     context: ./frontend
   #     dockerfile: Dockerfile
-  #   container_name: lineagehub-frontend
+  #   container_name: vocalis-frontend
   #   restart: unless-stopped
   #   ports:
   #     - "3000:3000"
@@ -59,27 +59,27 @@ services:
   #   depends_on:
   #     - backend
   #   networks:
-  #     - lineagehub-network
+  #     - vocalis-network
 
   # pgAdmin (optional - for database management)
   pgadmin:
     image: dpage/pgadmin4
-    container_name: lineagehub-pgadmin
+    container_name: vocalis-pgadmin
     restart: unless-stopped
     ports:
       - "5050:80"
     environment:
-      PGADMIN_DEFAULT_EMAIL: admin@lineagehub.local
+      PGADMIN_DEFAULT_EMAIL: admin@vocalis.local
       PGADMIN_DEFAULT_PASSWORD: admin123
     volumes:
       - pgadmin_data:/var/lib/pgadmin
     networks:
-      - lineagehub-network
+      - vocalis-network
     depends_on:
       - postgres
 
 networks:
-  lineagehub-network:
+  vocalis-network:
     driver: bridge
 
 volumes:
