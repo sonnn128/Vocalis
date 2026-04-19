@@ -232,19 +232,44 @@ public class BaseResponse<T> {
 ## 5. Git Conventions
 
 ### 5.1. Branch Naming
-```
+```text
 main                    # Production-ready
-dev                     # Integration branch
+develop                 # Integration branch
 feature/add-flashcard   # New feature
 bugfix/login-error      # Bug fix
+hotfix/security-patch   # Urgent fix
 ```
 
 ### 5.2. Commit Messages
-```
+```text
 feat: add study mode for flashcards
 fix: resolve JWT expiration issue
 docs: update API documentation
 refactor: extract button component
+test: add deck service unit tests
 style: fix UI alignment in header
 chore: update dependencies
+```
+
+### 5.3. Pull Request Template
+```markdown
+## Description
+Brief description of changes
+
+## Type of Change
+- [ ] Bug fix
+- [ ] New feature
+- [ ] Breaking change
+- [ ] Documentation update
+
+## Testing
+- [ ] Unit tests added/updated
+- [ ] Integration tests added/updated
+- [ ] Manual testing performed
+
+## Checklist
+- [ ] Code follows conventions
+- [ ] Self-reviewed
+- [ ] No console.log / print statements
+- [ ] No hardcoded values
 ```
