@@ -62,4 +62,16 @@ public class AuthController {
     public ResponseEntity<ApiResponse<UserDTO>> getProfile() {
         return getMe();
     }
+
+    /**
+     * POST /api/v1/auth/logout — stateless JWT logout (best-effort).
+     * The frontend calls this to standardize flow; server doesn't keep session.
+     */
+    @PostMapping("/logout")
+    public ResponseEntity<ApiResponse<Void>> logout() {
+        return ResponseEntity.ok(ApiResponse.<Void>builder()
+                .success(true)
+                .message("Logged out")
+                .build());
+    }
 }

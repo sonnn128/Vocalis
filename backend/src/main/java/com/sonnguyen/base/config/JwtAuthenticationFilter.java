@@ -21,15 +21,22 @@ import java.io.IOException;
 @Component
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
+
     private final JwtService jwtService;
     private final UserDetailsService userDetailsServiceImpl;
+    
     @Override
     protected void doFilterInternal(
             HttpServletRequest request,
             @NonNull HttpServletResponse response,
             @NonNull FilterChain filterChain
     ) throws ServletException, IOException {
-        log.info("Request: uri = {}, method = {}, authHeader = {}", request.getRequestURI(), request.getMethod(), request.getHeader("Authorization"));
+        String authHeaderForLog = request.getHeader("Authorization");
+        if (authHeaderForLog != null && authHeaderForLog.startsWith("Bearer ")) {
+            authHeaderForLog = "Bearer <redacted>";
+        }
+        log.info("Request: uri = {}, method = {}, authHeader = {}",
+            request.getRequestURI(), request.getMethod(), authHeaderForLog);
         final String authHeader = request.getHeader("Authorization");
         final String jwt;
         final String username;

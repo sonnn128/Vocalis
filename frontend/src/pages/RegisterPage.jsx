@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { Form, Input, Button, Card, Typography, message, Divider, Select } from 'antd';
-import { UserOutlined, LockOutlined, MailOutlined, PhoneOutlined, HomeOutlined } from '@ant-design/icons';
+import { Form, Input, Button, Card, Typography, message, Divider } from 'antd';
+import { UserOutlined, LockOutlined, MailOutlined } from '@ant-design/icons';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext.jsx';
 
@@ -14,7 +14,11 @@ const RegisterPage = () => {
   const onFinish = async (values) => {
     setLoading(true);
     try {
-      const result = await register(values);
+      const result = await register({
+        username: values.username,
+        email: values.email,
+        password: values.password
+      });
       if (result.success) {
         message.success('Registration successful! Please login.');
         navigate('/login');
@@ -39,7 +43,7 @@ const RegisterPage = () => {
       <Card style={{ width: '100%', maxWidth: 400 }}>
         <div style={{ textAlign: 'center', marginBottom: '32px' }}>
           <Title level={2}>Register</Title>
-          <Paragraph>Create your account to start shopping.</Paragraph>
+          <Paragraph>Create your Vocalis account.</Paragraph>
         </div>
 
         <Form
@@ -74,57 +78,6 @@ const RegisterPage = () => {
           </Form.Item>
 
           <Form.Item
-            name="fullName"
-            rules={[{ required: true, message: 'Please input your full name!' }]}
-          >
-            <Input 
-              prefix={<UserOutlined />} 
-              placeholder="Full Name" 
-              size="large"
-            />
-          </Form.Item>
-
-          <Form.Item
-            name="phone"
-            rules={[
-              { required: true, message: 'Please input your phone number!' },
-              { pattern: /^[0-9+\-\s()]+$/, message: 'Please enter a valid phone number!' }
-            ]}
-          >
-            <Input 
-              prefix={<PhoneOutlined />} 
-              placeholder="Phone Number" 
-              size="large"
-            />
-          </Form.Item>
-
-          <Form.Item
-            name="address"
-            rules={[{ required: true, message: 'Please input your address!' }]}
-          >
-            <Input 
-              prefix={<HomeOutlined />} 
-              placeholder="Address" 
-              size="large"
-            />
-          </Form.Item>
-
-          <Form.Item
-            name="gender"
-            rules={[{ required: true, message: 'Please select your gender!' }]}
-          >
-            <Select
-              placeholder="Select Gender"
-              size="large"
-              options={[
-                { value: 'MALE', label: 'Male' },
-                { value: 'FEMALE', label: 'Female' },
-                { value: 'OTHER', label: 'Other' }
-              ]}
-            />
-          </Form.Item>
-
-          <Form.Item
             name="password"
             rules={[{ required: true, message: 'Please input your password!' }]}
           >
@@ -136,7 +89,7 @@ const RegisterPage = () => {
           </Form.Item>
 
           <Form.Item
-            name="confirmPassword"
+            name="repassword"
             dependencies={["password"]}
             rules={[
               { required: true, message: 'Please confirm your password!' },

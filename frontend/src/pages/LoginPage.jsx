@@ -17,21 +17,7 @@ const LoginPage = () => {
       const result = await login(values.username, values.password);
       if (result.success) {
         message.success('Login successful!');
-
-        // Check role and redirect accordingly
-        // We need to re-check isAdmin because state might update async, 
-        // but login return should have enough info or we can check the result data
-        // Ideally useAuth provides a way to check user object from result
-
-        // Let's assume the user state in context is updated or we check the returned data
-        const user = result.data.user || result.data.data.user;
-        const isAdmin = user?.roles?.some(r => r.name === 'ADMIN' || r.name === 'ROLE_ADMIN') || user?.role === 'ADMIN';
-
-        if (isAdmin) {
-          navigate('/admin/dashboard');
-        } else {
-          navigate('/');
-        }
+        navigate('/');
       } else {
         message.error(result.message);
       }

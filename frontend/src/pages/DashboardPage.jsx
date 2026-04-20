@@ -1,18 +1,14 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { Empty, message, Modal, Spin, Input, Select, Pagination } from 'antd';
+import { Button, Card, Col, Empty, message, Modal, Row, Space, Spin, Typography, Pagination } from 'antd';
 import {
   PlusOutlined,
-  SearchOutlined,
-  AppstoreOutlined,
-  UnorderedListOutlined,
 } from '@ant-design/icons';
 import { deckService } from '@/services/deck.service.js';
-import { useAuth } from '@/contexts/AuthContext.jsx';
 import DeckCard from '@/components/feature/DeckCard.jsx';
 import DeckFormModal from '@/components/feature/DeckFormModal.jsx';
 
-const { Search } = Input;
+const { Title, Text } = Typography;
 
 const DashboardPage = () => {
   const [decks, setDecks] = useState([]);
@@ -24,7 +20,6 @@ const DashboardPage = () => {
   const [editingDeck, setEditingDeck] = useState(null);
 
   const [searchParams, setSearchParams] = useSearchParams();
-  const { user } = useAuth();
 
   // Open create modal when ?create=true
   useEffect(() => {
@@ -120,72 +115,74 @@ const DashboardPage = () => {
   };
 
   return (
-    <div className="dashboard-page">
-      {/* Header */}
-      <div className="page-header">
-        <div>
-          <h1 className="page-title">My Decks</h1>
-          <p className="page-subtitle">
-            {pagination.total} deck{pagination.total !== 1 ? 's' : ''} in your library
-          </p>
-        </div>
-        <button
-          id="create-deck-btn"
-          className="btn-primary"
-          onClick={() => { setEditingDeck(null); setModalOpen(true); }}
-        >
-          <PlusOutlined /> New Deck
-        </button>
-      </div>
-
-      {/* Content */}
-      {loading ? (
-        <div className="loading-container">
-          <Spin size="large" />
-        </div>
-      ) : decks.length === 0 ? (
-        <div className="empty-state">
-          <Empty
-            description={
-              <span>
-                You have no decks yet.{' '}
-                <button
-                  className="link-btn"
-                  onClick={() => { setEditingDeck(null); setModalOpen(true); }}
-                >
-                  Create your first deck!
-                </button>
-              </span>
-            }
-          />
-        </div>
-      ) : (
-        <>
-          <div className="decks-grid">
-            {decks.map((deck) => (
-              <DeckCard
-                key={deck.id}
-                deck={deck}
-                isOwner={true}
-                onEdit={handleEdit}
-                onDelete={handleDelete}
-              />
-            ))}
-          </div>
-
-          {pagination.total > pagination.pageSize && (
-            <div className="pagination-wrapper">
-              <Pagination
-                current={pagination.current + 1}
-                total={pagination.total}
-                pageSize={pagination.pageSize}
-                onChange={(page) => fetchDecks(page - 1)}
-                showTotal={(total) => `Total ${total} decks`}
-              />
+    <div style={{ maxWidth: 1100, margin: '0 auto' }}>
+      <Space direction="vertical" size={16} style={{ width: '100%' }}>
+        <Card style={{ borderRadius: 12 }}>
+          <Space style={{ width: '100%', justifyContent: 'space-between' }} align="start">
+            <div>
+              <Title level={3} style={{ marginTop: 0, marginBottom: 4 }}>My Decks</Title>
+              <Text type="secondary">
+                {pagination.total} deck{pagination.total !== 1 ? 's' : ''} in your library
+              </Text>
             </div>
-          )}
-        </>
-      )}
+            <Button
+              id="create-deck-btn"
+              type="primary"
+              icon={<PlusOutlined />}
+              onClick={() => { setEditingDeck(null); setModalOpen(true); }}
+            >
+              New Deck
+            </Button>
+          </Space>
+        </Card>
+
+        {loading ? (
+          <div style={{ display: 'flex', justifyContent: 'center', padding: 48 }}>
+            <Spin size="large" />
+          </div>
+        ) : decks.length === 0 ? (
+          <Card style={{ borderRadius: 12 }}>
+            <Empty
+              description={
+                <span>
+                  You have no decks yet.{' '}
+                  <a onClick={() => { setEditingDeck(null); setModalOpen(true); }}>
+                    Create your first deck
+                  </a>
+                  .
+                </span>
+              }
+            />
+          </Card>
+        ) : (
+          <>
+            <Row gutter={[16, 16]}>
+              {decks.map((deck) => (
+                <Col key={deck.id} xs={24} sm={12} lg={8}>
+                  <DeckCard
+                    deck={deck}
+                    isOwner={true}
+                    onEdit={handleEdit}
+                    onDelete={handleDelete}
+                  />
+                </Col>
+              ))}
+            </Row>
+
+            {pagination.total > pagination.pageSize && (
+              <div style={{ display: 'flex', justifyContent: 'center', padding: '8px 0 24px' }}>
+                <Pagination
+                  current={pagination.current + 1}
+                  total={pagination.total}
+                  pageSize={pagination.pageSize}
+                  onChange={(page) => fetchDecks(page - 1)}
+                  showTotal={(total) => `Total ${total} decks`}
+                />
+              </div>
+            )}
+          </>
+        )}
+      </Space>
 
       {/* Create/Edit Modal */}
       <DeckFormModal

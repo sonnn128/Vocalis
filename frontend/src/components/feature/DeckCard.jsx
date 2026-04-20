@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Card, Badge, Tooltip, Dropdown, Button } from 'antd';
+import { Card, Badge, Tooltip, Dropdown, Button, Space, Tag, Typography, theme } from 'antd';
 import {
   BookOutlined,
   GlobalOutlined,
@@ -11,8 +11,11 @@ import {
   ReadOutlined,
 } from '@ant-design/icons';
 
+const { Text } = Typography;
+
 const DeckCard = ({ deck, onEdit, onDelete, isOwner = false }) => {
   const navigate = useNavigate();
+  const { token } = theme.useToken();
 
   const menuItems = isOwner
     ? [
@@ -59,62 +62,60 @@ const DeckCard = ({ deck, onEdit, onDelete, isOwner = false }) => {
       ];
 
   return (
-    <div
-      className="deck-card"
+    <Card
+      hoverable
       onClick={() => navigate(`/decks/${deck.id}`)}
-      role="button"
-      tabIndex={0}
-      onKeyDown={(e) => e.key === 'Enter' && navigate(`/decks/${deck.id}`)}
+      style={{ borderRadius: 12, height: '100%' }}
+      bodyStyle={{ display: 'flex', flexDirection: 'column', height: '100%' }}
     >
-      <div className="deck-card-header">
-        <div className="deck-icon">
-          <BookOutlined />
-        </div>
-        <div className="deck-visibility">
+      <Space style={{ width: '100%', justifyContent: 'space-between' }} align="start">
+        <Space align="center" size={10}>
+          <div
+            style={{
+              width: 40,
+              height: 40,
+              borderRadius: 12,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              background: token.colorPrimaryBg,
+            }}
+          >
+            <BookOutlined style={{ color: token.colorPrimary, fontSize: 18 }} />
+          </div>
+
           <Tooltip title={deck.isPublic ? 'Public deck' : 'Private deck'}>
             {deck.isPublic ? (
-              <GlobalOutlined className="visibility-icon public" />
+              <Tag icon={<GlobalOutlined />} color="blue">Public</Tag>
             ) : (
-              <LockOutlined className="visibility-icon private" />
+              <Tag icon={<LockOutlined />}>Private</Tag>
             )}
           </Tooltip>
-        </div>
-      </div>
+        </Space>
 
-      <div className="deck-card-body">
-        <h3 className="deck-title">{deck.title}</h3>
-        {deck.description && (
-          <p className="deck-description">{deck.description}</p>
+        <div onClick={(e) => e.stopPropagation()}>
+          <Dropdown menu={{ items: menuItems }} trigger={['click']} placement="bottomRight">
+            <Button type="text" icon={<EllipsisOutlined />} />
+          </Dropdown>
+        </div>
+      </Space>
+
+      <div style={{ marginTop: 12, flex: 1 }}>
+        <div style={{ fontSize: 16, fontWeight: 800, marginBottom: 6 }}>
+          {deck.title}
+        </div>
+        {deck.description ? (
+          <Text type="secondary">{deck.description}</Text>
+        ) : (
+          <Text type="secondary">No description</Text>
         )}
       </div>
 
-      <div className="deck-card-footer">
-        <Badge
-          count={deck.cardCount || 0}
-          showZero
-          style={{ backgroundColor: '#6366f1' }}
-          overflowCount={999}
-        />
-        <span className="card-count-label">
-          {deck.cardCount === 1 ? 'card' : 'cards'}
-        </span>
-
-        <div className="deck-actions" onClick={(e) => e.stopPropagation()}>
-          <Dropdown
-            menu={{ items: menuItems }}
-            trigger={['click']}
-            placement="bottomRight"
-          >
-            <Button
-              type="text"
-              icon={<EllipsisOutlined />}
-              size="small"
-              className="deck-menu-btn"
-            />
-          </Dropdown>
-        </div>
+      <div style={{ marginTop: 16, display: 'flex', alignItems: 'center', gap: 10 }}>
+        <Badge count={deck.cardCount || 0} showZero overflowCount={999} />
+        <Text type="secondary">{deck.cardCount === 1 ? 'card' : 'cards'}</Text>
       </div>
-    </div>
+    </Card>
   );
 };
 
