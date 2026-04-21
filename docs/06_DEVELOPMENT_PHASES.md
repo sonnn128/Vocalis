@@ -153,6 +153,7 @@ Tạo động lực học tập bằng gamification và biểu đồ thống kê
 ### Ghi chú mở rộng (đã triển khai)
 - [x] Quiz report sau khi nộp bài (danh sách đúng/sai theo câu).
 - [x] Gamification foundation (points + streak + session counters) ở frontend local storage.
+- [x] Leaderboard nhanh (local) + badges cơ bản để ra mắt sớm.
 
 ---
 

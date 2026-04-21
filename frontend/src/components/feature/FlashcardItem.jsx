@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Card, Typography, Tag, Divider } from 'antd';
 import { SoundOutlined } from '@ant-design/icons';
 import './FlashcardItem.css';
+import { speakText } from '@/utils/speech.js';
 
 const { Title, Paragraph } = Typography;
 
@@ -10,11 +11,7 @@ const FlashcardItem = ({ card, isFlipped, onFlip }) => {
 
   const playAudio = (e) => {
     e.stopPropagation();
-    if ('speechSynthesis' in window) {
-      const utterance = new SpeechSynthesisUtterance(card.frontText);
-      utterance.lang = 'en-US';
-      window.speechSynthesis.speak(utterance);
-    }
+    speakText(card.frontText);
   };
 
   return (

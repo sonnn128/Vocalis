@@ -13,6 +13,7 @@ import {
   LockOutlined,
   BookOutlined,
   QuestionCircleOutlined,
+  SoundOutlined,
 } from '@ant-design/icons';
 import { deckService } from '@/services/deck.service.js';
 import { flashcardService } from '@/services/flashcard.service.js';
@@ -20,6 +21,7 @@ import { useAuth } from '@/contexts/AuthContext.jsx';
 import DeckFormModal from '@/components/feature/DeckFormModal.jsx';
 import FlashcardFormModal from '@/components/feature/FlashcardFormModal.jsx';
 import './DeckDetailPage.css';
+import { speakText } from '@/utils/speech.js';
 
 const DeckDetailPage = () => {
   const { deckId } = useParams();
@@ -152,7 +154,22 @@ const DeckDetailPage = () => {
       title: 'Front (Word)',
       dataIndex: 'frontText',
       key: 'frontText',
-      render: (text) => <strong className="front-text">{text}</strong>,
+      render: (text) => (
+        <Space>
+          <strong className="front-text">{text}</strong>
+          <Tooltip title="Play pronunciation">
+            <Button
+              type="text"
+              size="small"
+              icon={<SoundOutlined />}
+              onClick={(e) => {
+                e.stopPropagation();
+                speakText(text);
+              }}
+            />
+          </Tooltip>
+        </Space>
+      ),
     },
     {
       title: 'Back (Meaning)',

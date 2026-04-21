@@ -9,6 +9,12 @@ const { Title, Text } = Typography;
 
 const COLORS = ['#6366f1', '#10b981', '#f59e0b']; // Learning, Mastered, New
 
+const getBadgeStates = (gamification) => ([
+  { key: 'rookie', label: 'Rookie', achieved: gamification.totalSessions >= 1 },
+  { key: 'focus', label: 'Focus 3-Day', achieved: gamification.streakDays >= 3 },
+  { key: 'grinder', label: 'Point 100', achieved: gamification.points >= 100 },
+]);
+
 const StatisticsPage = () => {
   const [stats, setStats] = useState(null);
   const [gamification, setGamification] = useState(getGamificationState());
@@ -61,6 +67,7 @@ const StatisticsPage = () => {
     { name: 'Learning', count: safeStats.learningCards, fill: '#6366f1' },
     { name: 'Mastered', count: safeStats.masteredCards, fill: '#10b981' },
   ];
+  const badges = getBadgeStates(gamification);
 
   return (
     <div style={{ maxWidth: 1000, margin: '0 auto', paddingBottom: 40 }}>
@@ -155,6 +162,30 @@ const StatisticsPage = () => {
           </Card>
         </Col>
       </Row>
+
+      <Card title="Badge Progress" style={{ borderRadius: 12, marginTop: 24 }}>
+        <Row gutter={[12, 12]}>
+          {badges.map((badge) => (
+            <Col xs={24} sm={12} lg={8} key={badge.key}>
+              <Card
+                size="small"
+                style={{
+                  borderRadius: 10,
+                  borderColor: badge.achieved ? '#10b981' : '#d1d5db',
+                  background: badge.achieved ? '#ecfdf5' : '#fff',
+                }}
+              >
+                <Text strong>{badge.label}</Text>
+                <div>
+                  <Text type={badge.achieved ? undefined : 'secondary'}>
+                    {badge.achieved ? 'Unlocked' : 'Locked'}
+                  </Text>
+                </div>
+              </Card>
+            </Col>
+          ))}
+        </Row>
+      </Card>
     </div>
   );
 };

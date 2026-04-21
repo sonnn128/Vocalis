@@ -9,6 +9,7 @@ import {
   BarChartOutlined,
   ReadOutlined,
   QuestionCircleOutlined,
+  TrophyOutlined,
 } from '@ant-design/icons';
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext.jsx';
@@ -26,6 +27,7 @@ const ClientLayout = () => {
     if (location.pathname.startsWith('/study')) return '/study';
     if (location.pathname.startsWith('/quiz')) return '/quiz';
     if (location.pathname.startsWith('/statistics')) return '/statistics';
+    if (location.pathname.startsWith('/leaderboard')) return '/leaderboard';
     return '/';
   }, [location.pathname]);
 
@@ -59,6 +61,8 @@ const ClientLayout = () => {
         style={{
           borderRight: `1px solid ${token.colorBorderSecondary}`,
           background: token.colorBgContainer,
+          boxShadow: '8px 0 28px rgba(99, 102, 241, 0.08)',
+          backdropFilter: 'blur(8px)',
         }}
       >
         <div
@@ -70,6 +74,7 @@ const ClientLayout = () => {
             padding: '0 16px',
             cursor: 'pointer',
             borderBottom: `1px solid ${token.colorBorderSecondary}`,
+            backdropFilter: 'blur(10px)',
           }}
           onClick={() => navigate('/')}
         >
@@ -78,12 +83,13 @@ const ClientLayout = () => {
               width: 34,
               height: 34,
               borderRadius: 10,
-              background: token.colorPrimary,
+              background: `linear-gradient(135deg, ${token.colorPrimary}, #8b5cf6)`,
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              color: '#fff',
+              color: '#ffffff',
               fontWeight: 700,
+              boxShadow: `0 10px 24px ${token.colorPrimary}55`,
             }}
           >
             V
@@ -139,6 +145,12 @@ const ClientLayout = () => {
               label: 'Quiz Mode',
               onClick: () => navigate('/quiz'),
             },
+            {
+              key: '/leaderboard',
+              icon: <TrophyOutlined />,
+              label: 'Leaderboard',
+              onClick: () => navigate('/leaderboard'),
+            },
           ]}
         />
       </Sider>
@@ -153,6 +165,7 @@ const ClientLayout = () => {
             justifyContent: 'flex-end',
             background: token.colorBgContainer,
             borderBottom: `1px solid ${token.colorBorderSecondary}`,
+            backdropFilter: 'blur(8px)',
           }}
         >
           <Dropdown menu={{ items: userMenuItems }} trigger={['click']} placement="bottomRight">

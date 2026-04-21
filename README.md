@@ -25,7 +25,7 @@ Giai đoạn này tập trung vào các tính năng cơ bản nhất để ứng
 ### Phase 3: Advanced Features & Community (Tính năng mở rộng & Cộng đồng)
 - [ ] **Bộ từ vựng công khai (Public Decks):** Người dùng có thể chia sẻ bộ từ vựng của mình cho cộng đồng hoặc sao chép bộ từ vựng của người khác.
 - [x] **Chế độ học đa dạng:** Đã bổ sung mode Trắc nghiệm (Quiz), Gõ lại từ (Typing mode), và Quiz Hub theo deck.
-- [ ] **Gamification:** Đã có points + streak cơ bản; còn thiếu leaderboard/huy hiệu.
+- [x] **Gamification (MVP):** Points + streak + leaderboard local + badge cơ bản đã có.
 
 ### Phase 4: Optimization & Deployment (Tối ưu hóa & Triển khai)
 - [ ] **Tối ưu hiệu năng:** Cải thiện tốc độ load (Lazy loading, Caching).

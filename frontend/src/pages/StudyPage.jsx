@@ -1,13 +1,14 @@
-import React, { useMemo, useState, useEffect } from 'react';
+import React, { useMemo, useState, useEffect, useRef, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { 
-  Spin, Button, Progress, Layout, Typography, message, Row, Col, Segmented, Card, Input, Space
+  Spin, Button, Progress, Layout, Typography, message, Row, Col, Segmented, Card, Input, Space, Switch, Select
 } from 'antd';
-import { ArrowLeftOutlined, FireOutlined, CheckCircleOutlined } from '@ant-design/icons';
+import { ArrowLeftOutlined, FireOutlined, CheckCircleOutlined, SoundOutlined } from '@ant-design/icons';
 import { studyService } from '@/services/study.service.js';
 import { deckService } from '@/services/deck.service.js';
 import FlashcardItem from '@/components/feature/FlashcardItem.jsx';
 import { addStudyActivity } from '@/utils/gamification.js';
+import { speakCard, getAudioSettings, saveAudioSettings } from '@/utils/speech.js';
 
 const { Content } = Layout;
 const { Title, Paragraph } = Typography;
@@ -29,6 +30,8 @@ const StudyPage = () => {
   const [quizChecked, setQuizChecked] = useState(false);
   const [reviewedCount, setReviewedCount] = useState(0);
   const [sessionReward, setSessionReward] = useState(null);
+  const typingInputRef = useRef(null);
+  const [audioSettings, setAudioSettings] = useState(getAudioSettings());
 
   useEffect(() => {
     const fetchStudyData = async () => {
@@ -56,7 +59,7 @@ const StudyPage = () => {
     fetchStudyData();
   }, [deckId]);
 
-  const handleReview = async (quality) => {
+  const handleReview = useCallback(async (quality) => {
     const currentCard = cards[currentIndex];
     
     try {
@@ -71,7 +74,7 @@ const StudyPage = () => {
       message.error('Failed to submit review');
       nextCard(); // Still go to next to not block user
     }
-  };
+  }, [cards, currentIndex, reviewedCount]);
 
   const nextCard = (nextReviewedCount = reviewedCount) => {
     setIsFlipped(false);
@@ -121,6 +124,42 @@ const StudyPage = () => {
   const canShowReviewButtons = (studyMode === 'flashcard' && isFlipped)
     || (studyMode === 'typing' && typingChecked)
     || (studyMode === 'quiz' && quizChecked);
+
+  useEffect(() => {
+    if (studyMode === 'typing' && typingInputRef.current) {
+      typingInputRef.current.focus();
+    }
+  }, [studyMode, currentIndex]);
+
+  useEffect(() => {
+    const onKeyDown = (event) => {
+      if (loading || finished) return;
+      if (event.target.tagName === 'INPUT' || event.target.tagName === 'TEXTAREA') return;
+
+      if (studyMode === 'flashcard' && event.code === 'Space') {
+        event.preventDefault();
+        setIsFlipped((prev) => !prev);
+      }
+      if (event.key.toLowerCase() === 'p') {
+        event.preventDefault();
+        if (currentCard?.frontText) speakCard(currentCard, audioSettings);
+      }
+
+      if (canShowReviewButtons) {
+        if (event.key === '1') handleReview(1);
+        if (event.key === '2') handleReview(2);
+        if (event.key === '3') handleReview(3);
+      }
+    };
+
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [loading, finished, studyMode, canShowReviewButtons, handleReview, currentCard, audioSettings]);
+
+  useEffect(() => {
+    if (!audioSettings.autoPlay || !currentCard?.frontText) return;
+    speakCard(currentCard, audioSettings);
+  }, [currentIndex, currentCard, audioSettings]);
 
   if (loading) {
     return (
@@ -177,6 +216,49 @@ const StudyPage = () => {
       </div>
       
       <Progress percent={progressPercent} showInfo={false} strokeColor="#6366f1" style={{ marginBottom: 40 }} />
+      <Card size="small" style={{ marginBottom: 16, borderRadius: 10 }}>
+        <Space wrap>
+          <Space>
+            <span>Auto-play</span>
+            <Switch
+              checked={audioSettings.autoPlay}
+              onChange={(checked) => {
+                const next = saveAudioSettings({ ...audioSettings, autoPlay: checked });
+                setAudioSettings(next);
+              }}
+            />
+          </Space>
+          <Space>
+            <span>Speak example</span>
+            <Switch
+              checked={audioSettings.speakExample}
+              onChange={(checked) => {
+                const next = saveAudioSettings({ ...audioSettings, speakExample: checked });
+                setAudioSettings(next);
+              }}
+            />
+          </Space>
+          <Space>
+            <span>Speed</span>
+            <Select
+              value={audioSettings.rate}
+              style={{ width: 120 }}
+              options={[
+                { label: '0.8x', value: 0.8 },
+                { label: '1.0x', value: 1.0 },
+                { label: '1.2x', value: 1.2 },
+              ]}
+              onChange={(value) => {
+                const next = saveAudioSettings({ ...audioSettings, rate: value });
+                setAudioSettings(next);
+              }}
+            />
+          </Space>
+        </Space>
+      </Card>
+      <Paragraph type="secondary" style={{ marginTop: -24, marginBottom: 24 }}>
+        Shortcuts: <b>Space</b> flip card, <b>P</b> play audio, <b>1/2/3</b> = Hard/Good/Easy
+      </Paragraph>
 
       <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 24 }}>
         <Segmented
@@ -209,7 +291,11 @@ const StudyPage = () => {
         <Card style={{ borderRadius: 12 }}>
           <Space direction="vertical" size={16} style={{ width: '100%' }}>
             <Title level={4} style={{ margin: 0 }}>{currentCard.frontText}</Title>
+            <Button icon={<SoundOutlined />} onClick={() => speakCard(currentCard, audioSettings)}>
+              Play Audio
+            </Button>
             <Input
+              ref={typingInputRef}
               placeholder="Type the meaning..."
               value={typingAnswer}
               onChange={(e) => setTypingAnswer(e.target.value)}
@@ -235,6 +321,9 @@ const StudyPage = () => {
           <Space direction="vertical" size={16} style={{ width: '100%' }}>
             <Title level={4} style={{ margin: 0 }}>Choose the best meaning</Title>
             <div style={{ fontSize: 20, fontWeight: 700 }}>{currentCard.frontText}</div>
+            <Button icon={<SoundOutlined />} onClick={() => speakCard(currentCard, audioSettings)}>
+              Play Audio
+            </Button>
             <Space direction="vertical" size={8} style={{ width: '100%' }}>
               {quizOptions.map((option) => (
                 <Button

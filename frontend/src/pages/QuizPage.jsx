@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Button, Card, Col, Progress, Radio, Row, Space, Spin, Typography, message, Result, List, Tag } from 'antd';
-import { ArrowLeftOutlined, CheckCircleOutlined, CloseCircleOutlined } from '@ant-design/icons';
+import { Button, Card, Col, Progress, Radio, Row, Space, Spin, Typography, message, Result, List, Tag, Switch, Select } from 'antd';
+import { ArrowLeftOutlined, CheckCircleOutlined, CloseCircleOutlined, SoundOutlined } from '@ant-design/icons';
 import { studyService } from '@/services/study.service.js';
 import { deckService } from '@/services/deck.service.js';
 import { addStudyActivity } from '@/utils/gamification.js';
+import { speakCard, getAudioSettings, saveAudioSettings } from '@/utils/speech.js';
 
 const { Title, Text, Paragraph } = Typography;
 const QUIZ_HISTORY_KEY = 'vocalis.quiz.history';
@@ -24,6 +25,7 @@ const QuizPage = () => {
   const [finished, setFinished] = useState(false);
   const [questionResults, setQuestionResults] = useState([]);
   const [sessionReward, setSessionReward] = useState(null);
+  const [audioSettings, setAudioSettings] = useState(getAudioSettings());
 
   useEffect(() => {
     if (!finished || cards.length === 0) return;
@@ -95,7 +97,7 @@ const QuizPage = () => {
     
     // Pick 3 random wrong options
     const wrongOptions = cards.filter(c => c.id !== correctCard.id);
-    const shuffledWrong = wrongOptions.sort(() => 0.5 - Math.random()).slice(0, 3);
+    const shuffledWrong = [...wrongOptions].sort(() => 0.5 - Math.random()).slice(0, 3);
     
     const allOptions = [...options, ...shuffledWrong];
     return allOptions.sort(() => 0.5 - Math.random());
@@ -148,6 +150,40 @@ const QuizPage = () => {
       setFinished(true);
     }
   };
+
+  useEffect(() => {
+    const onKeyDown = (event) => {
+      if (loading || finished) return;
+      if (event.target.tagName === 'INPUT' || event.target.tagName === 'TEXTAREA') return;
+
+      const optionIdx = Number(event.key);
+      if (!isAnswered && optionIdx >= 1 && optionIdx <= currentOptions.length) {
+        const option = currentOptions[optionIdx - 1];
+        if (option) {
+          setSelectedOption(option.id);
+        }
+      }
+
+      if (event.key === 'Enter') {
+        if (!isAnswered && selectedOption) {
+          handleSubmitAnswer();
+        } else if (isAnswered) {
+          handleNextQuestion();
+        }
+      }
+      if (event.key.toLowerCase() === 'p' && cards[currentIndex]?.frontText) {
+        speakCard(cards[currentIndex], audioSettings);
+      }
+    };
+
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [loading, finished, isAnswered, selectedOption, currentOptions, cards, currentIndex, audioSettings]);
+
+  useEffect(() => {
+    if (!audioSettings.autoPlay || !cards[currentIndex]?.frontText) return;
+    speakCard(cards[currentIndex], audioSettings);
+  }, [currentIndex, cards, audioSettings]);
 
   if (loading) {
     return (
@@ -232,6 +268,49 @@ const QuizPage = () => {
       <Paragraph type="secondary" style={{ marginTop: -8, marginBottom: 20 }}>
         Deck: <b>{deck?.title || '...'}</b> | Current score: <b>{score}</b>
       </Paragraph>
+      <Card size="small" style={{ marginBottom: 16, borderRadius: 10 }}>
+        <Space wrap>
+          <Space>
+            <span>Auto-play</span>
+            <Switch
+              checked={audioSettings.autoPlay}
+              onChange={(checked) => {
+                const next = saveAudioSettings({ ...audioSettings, autoPlay: checked });
+                setAudioSettings(next);
+              }}
+            />
+          </Space>
+          <Space>
+            <span>Speak example</span>
+            <Switch
+              checked={audioSettings.speakExample}
+              onChange={(checked) => {
+                const next = saveAudioSettings({ ...audioSettings, speakExample: checked });
+                setAudioSettings(next);
+              }}
+            />
+          </Space>
+          <Space>
+            <span>Speed</span>
+            <Select
+              value={audioSettings.rate}
+              style={{ width: 120 }}
+              options={[
+                { label: '0.8x', value: 0.8 },
+                { label: '1.0x', value: 1.0 },
+                { label: '1.2x', value: 1.2 },
+              ]}
+              onChange={(value) => {
+                const next = saveAudioSettings({ ...audioSettings, rate: value });
+                setAudioSettings(next);
+              }}
+            />
+          </Space>
+        </Space>
+      </Card>
+      <Paragraph type="secondary" style={{ marginTop: -8, marginBottom: 20 }}>
+        Shortcuts: <b>1-4</b> choose option, <b>Enter</b> check/next, <b>P</b> play audio
+      </Paragraph>
       
       <Progress percent={progressPercent} showInfo={false} strokeColor="#6366f1" style={{ marginBottom: 32 }} />
 
@@ -239,13 +318,16 @@ const QuizPage = () => {
         <div style={{ textAlign: 'center', marginBottom: 32, padding: '20px 0' }}>
           <Text type="secondary" style={{ fontSize: 16, textTransform: 'uppercase', letterSpacing: 1 }}>What is the meaning of:</Text>
           <Title level={2} style={{ marginTop: 8, color: '#111827' }}>{currentCard.frontText}</Title>
+          <Button icon={<SoundOutlined />} onClick={() => speakCard(currentCard, audioSettings)}>
+            Play Audio
+          </Button>
           {currentCard.frontImageUrl && (
             <img src={currentCard.frontImageUrl} alt="Flashcard visual" style={{ maxWidth: '100%', maxHeight: 200, marginTop: 16, borderRadius: 8 }} />
           )}
         </div>
 
         <Radio.Group onChange={handleSelectOption} value={selectedOption} style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: 12 }}>
-          {currentOptions.map((opt) => {
+          {currentOptions.map((opt, index) => {
             const isCorrect = isAnswered && opt.id === currentCard.id;
             const isWrongSelected = isAnswered && selectedOption === opt.id && opt.id !== currentCard.id;
             
@@ -280,6 +362,7 @@ const QuizPage = () => {
               >
                 <Radio value={opt.id} disabled={isAnswered} style={{ marginRight: 16 }} />
                 <span style={{ fontSize: 16, flex: 1 }}>{opt.backText}</span>
+                <Tag style={{ marginRight: 8 }}>{index + 1}</Tag>
                 {isCorrect && <CheckCircleOutlined style={{ color: '#10b981', fontSize: 20 }} />}
                 {isWrongSelected && <CloseCircleOutlined style={{ color: '#ef4444', fontSize: 20 }} />}
               </label>
