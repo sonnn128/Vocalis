@@ -1,11 +1,13 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Button, Card, Col, Progress, Radio, Row, Space, Spin, Typography, message, Result } from 'antd';
+import { Button, Card, Col, Progress, Radio, Row, Space, Spin, Typography, message, Result, List, Tag } from 'antd';
 import { ArrowLeftOutlined, CheckCircleOutlined, CloseCircleOutlined } from '@ant-design/icons';
 import { studyService } from '@/services/study.service.js';
 import { deckService } from '@/services/deck.service.js';
+import { addStudyActivity } from '@/utils/gamification.js';
 
 const { Title, Text, Paragraph } = Typography;
+const QUIZ_HISTORY_KEY = 'vocalis.quiz.history';
 
 const QuizPage = () => {
   const { deckId } = useParams();
@@ -20,6 +22,42 @@ const QuizPage = () => {
   const [isAnswered, setIsAnswered] = useState(false);
   const [score, setScore] = useState(0);
   const [finished, setFinished] = useState(false);
+  const [questionResults, setQuestionResults] = useState([]);
+  const [sessionReward, setSessionReward] = useState(null);
+
+  useEffect(() => {
+    if (!finished || cards.length === 0) return;
+    const percentage = Math.round((score / cards.length) * 100);
+    try {
+      const raw = localStorage.getItem(QUIZ_HISTORY_KEY);
+      const history = raw ? JSON.parse(raw) : [];
+      const item = {
+        deckId,
+        deckTitle: deck?.title,
+        score,
+        total: cards.length,
+        percent: percentage,
+        finishedAt: new Date().toISOString(),
+      };
+      const next = [item, ...(Array.isArray(history) ? history : [])].slice(0, 20);
+      localStorage.setItem(QUIZ_HISTORY_KEY, JSON.stringify(next));
+    } catch {
+      // no-op
+    }
+  }, [finished, cards.length, score, deckId, deck?.title]);
+
+  useEffect(() => {
+    if (!finished || cards.length === 0 || sessionReward) return;
+    const pointsEarned = score * 10;
+    const gamification = addStudyActivity({
+      cardsReviewed: cards.length,
+      pointsEarned,
+    });
+    setSessionReward({
+      pointsEarned,
+      streakDays: gamification.streakDays,
+    });
+  }, [finished, cards.length, score, sessionReward]);
 
   useEffect(() => {
     const fetchQuizData = async () => {
@@ -77,8 +115,26 @@ const QuizPage = () => {
     if (selectedOption === currentCard.id) {
       setScore(prev => prev + 1);
       message.success('Correct!');
+      setQuestionResults((prev) => [
+        ...prev,
+        {
+          frontText: currentCard.frontText,
+          selected: currentOptions.find((opt) => opt.id === selectedOption)?.backText || '',
+          correct: currentCard.backText,
+          isCorrect: true,
+        },
+      ]);
     } else {
       message.error('Incorrect!');
+      setQuestionResults((prev) => [
+        ...prev,
+        {
+          frontText: currentCard.frontText,
+          selected: currentOptions.find((opt) => opt.id === selectedOption)?.backText || '',
+          correct: currentCard.backText,
+          isCorrect: false,
+        },
+      ]);
     }
   };
 
@@ -105,7 +161,7 @@ const QuizPage = () => {
     const percentage = Math.round((score / cards.length) * 100);
     return (
       <div style={{ maxWidth: 800, margin: '40px auto' }}>
-        <Card style={{ borderRadius: 12, textAlign: 'center', padding: '40px 20px' }}>
+        <Card style={{ borderRadius: 12, textAlign: 'center', padding: '40px 20px', marginBottom: 16 }}>
           <Result
             status={percentage >= 50 ? "success" : "warning"}
             title="Quiz Completed!"
@@ -114,10 +170,42 @@ const QuizPage = () => {
               <Button type="primary" key="console" onClick={() => navigate(`/decks/${deckId}`)}>
                 Back to Deck
               </Button>,
-              <Button key="buy" onClick={() => window.location.reload()}>
+              <Button key="retry" onClick={() => navigate(`/quiz/${deckId}`)}>
                 Try Again
               </Button>,
+              <Button key="hub" onClick={() => navigate('/quiz')}>
+                Quiz Hub
+              </Button>,
             ]}
+          />
+          <Paragraph style={{ marginBottom: 4 }}>
+            Session reward: <b>+{sessionReward?.pointsEarned || 0} points</b>
+          </Paragraph>
+          <Paragraph type="secondary" style={{ marginBottom: 0 }}>
+            Current streak: <b>{sessionReward?.streakDays || 0} day(s)</b>
+          </Paragraph>
+        </Card>
+
+        <Card title="Quiz Report" style={{ borderRadius: 12 }}>
+          <List
+            dataSource={questionResults}
+            locale={{ emptyText: 'No report data.' }}
+            renderItem={(item, index) => (
+              <List.Item>
+                <List.Item.Meta
+                  title={`Q${index + 1}. ${item.frontText}`}
+                  description={
+                    <>
+                      <div>Your answer: {item.selected || 'N/A'}</div>
+                      {!item.isCorrect && <div>Correct answer: {item.correct}</div>}
+                    </>
+                  }
+                />
+                <Tag color={item.isCorrect ? 'green' : 'red'}>
+                  {item.isCorrect ? 'Correct' : 'Wrong'}
+                </Tag>
+              </List.Item>
+            )}
           />
         </Card>
       </div>
@@ -141,6 +229,9 @@ const QuizPage = () => {
           Question {currentIndex + 1} of {cards.length}
         </div>
       </div>
+      <Paragraph type="secondary" style={{ marginTop: -8, marginBottom: 20 }}>
+        Deck: <b>{deck?.title || '...'}</b> | Current score: <b>{score}</b>
+      </Paragraph>
       
       <Progress percent={progressPercent} showInfo={false} strokeColor="#6366f1" style={{ marginBottom: 32 }} />
 

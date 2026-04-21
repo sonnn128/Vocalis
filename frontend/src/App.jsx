@@ -13,6 +13,7 @@ import DashboardPage from '@/pages/DashboardPage.jsx';
 import DeckDetailPage from '@/pages/DeckDetailPage.jsx';
 import StudyPage from '@/pages/StudyPage.jsx';
 import QuizPage from '@/pages/QuizPage.jsx';
+import QuizHubPage from '@/pages/QuizHubPage.jsx';
 import ExplorePage from '@/pages/ExplorePage.jsx';
 import StudyQueuePage from '@/pages/StudyQueuePage.jsx';
 import StatisticsPage from '@/pages/StatisticsPage.jsx';
@@ -41,6 +42,7 @@ const AppContent = () => {
           <Route path="/study" element={<StudyQueuePage />} />
           <Route path="/decks/:deckId" element={<DeckDetailPage />} />
           <Route path="/study/:deckId" element={<StudyPage />} />
+          <Route path="/quiz" element={<QuizHubPage />} />
           <Route path="/quiz/:deckId" element={<QuizPage />} />
           <Route path="/statistics" element={<StatisticsPage />} />
         </Route>

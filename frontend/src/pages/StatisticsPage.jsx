@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { Card, Col, Row, Spin, Statistic, Typography, message } from 'antd';
-import { BookOutlined, ReadOutlined, RocketOutlined, CheckCircleOutlined, SyncOutlined } from '@ant-design/icons';
+import { BookOutlined, ReadOutlined, CheckCircleOutlined, FireOutlined, StarOutlined } from '@ant-design/icons';
 import { studyService } from '@/services/study.service.js';
 import { PieChart, Pie, Cell, Tooltip as RechartsTooltip, Legend, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid } from 'recharts';
+import { getGamificationState } from '@/utils/gamification.js';
 
 const { Title, Text } = Typography;
 
@@ -10,6 +11,7 @@ const COLORS = ['#6366f1', '#10b981', '#f59e0b']; // Learning, Mastered, New
 
 const StatisticsPage = () => {
   const [stats, setStats] = useState(null);
+  const [gamification, setGamification] = useState(getGamificationState());
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -25,6 +27,7 @@ const StatisticsPage = () => {
       } catch (error) {
         message.error('Failed to load statistics');
       } finally {
+        setGamification(getGamificationState());
         setLoading(false);
       }
     };
@@ -80,6 +83,21 @@ const StatisticsPage = () => {
         <Col xs={24} sm={12} lg={8}>
           <Card style={{ borderRadius: 12 }}>
             <Statistic title="Mastery Progress" value={safeStats.totalCards > 0 ? Math.round((safeStats.masteredCards / safeStats.totalCards) * 100) : 0} suffix="%" prefix={<CheckCircleOutlined />} />
+          </Card>
+        </Col>
+        <Col xs={24} sm={12} lg={8}>
+          <Card style={{ borderRadius: 12 }}>
+            <Statistic title="Learning Streak" value={gamification.streakDays} suffix="days" prefix={<FireOutlined />} />
+          </Card>
+        </Col>
+        <Col xs={24} sm={12} lg={8}>
+          <Card style={{ borderRadius: 12 }}>
+            <Statistic title="Total Points" value={gamification.points} prefix={<StarOutlined />} />
+          </Card>
+        </Col>
+        <Col xs={24} sm={12} lg={8}>
+          <Card style={{ borderRadius: 12 }}>
+            <Statistic title="Study Sessions" value={gamification.totalSessions} />
           </Card>
         </Col>
       </Row>

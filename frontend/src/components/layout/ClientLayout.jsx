@@ -8,6 +8,7 @@ import {
   UserOutlined,
   BarChartOutlined,
   ReadOutlined,
+  QuestionCircleOutlined,
 } from '@ant-design/icons';
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext.jsx';
@@ -23,6 +24,7 @@ const ClientLayout = () => {
   const selectedKey = React.useMemo(() => {
     if (location.pathname.startsWith('/explore')) return '/explore';
     if (location.pathname.startsWith('/study')) return '/study';
+    if (location.pathname.startsWith('/quiz')) return '/quiz';
     if (location.pathname.startsWith('/statistics')) return '/statistics';
     return '/';
   }, [location.pathname]);
@@ -130,6 +132,12 @@ const ClientLayout = () => {
               icon: <BarChartOutlined />,
               label: 'Statistics',
               onClick: () => navigate('/statistics'),
+            },
+            {
+              key: '/quiz',
+              icon: <QuestionCircleOutlined />,
+              label: 'Quiz Mode',
+              onClick: () => navigate('/quiz'),
             },
           ]}
         />

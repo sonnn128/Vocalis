@@ -24,6 +24,12 @@
 
 ---
 
+## Trạng thái triển khai hiện tại (Update)
+
+- [x] Phase 1 (Auth + Deck/Flashcard CRUD): Đã có luồng chính hoạt động end-to-end.
+- [x] Phase 2 (Study + SRS): Đã có due queue, review API, study statistics.
+- [ ] Phase 3 (Quizzes & Analytics): Đã có Quiz page + Quiz hub + lưu lịch sử session ở FE, cần thêm analytics charts nâng cao.
+
 ## Phase 0: Project Setup (1 tuần)
 
 ### Mục tiêu
@@ -57,9 +63,9 @@ Thiết lập nền móng dự án, CI/CD cơ bản và cấu trúc thư mục t
 | Viết README.md hướng dẫn setup local | P0 | 1h |
 
 ### Deliverables
-- [ ] Backend chạy được và kết nối được Database.
+- [x] Backend chạy được và kết nối được Database.
 - [ ] Giao diện lỗi (`/swagger-ui/index.html`) hoạt động trơn tru.
-- [ ] Frontend chạy được và render được Layout Header/Sidebar.
+- [x] Frontend chạy được và render được Layout Header/Sidebar.
 
 ---
 
@@ -79,8 +85,8 @@ Cốt lõi MVP: Người dùng có thể đăng nhập, tạo, sửa, xóa các 
 | [FE] Protected Route hạn chế truy cập | P0 | 2h |
 
 #### Deliverables
-- [ ] Đăng ký, đăng nhập lấy JWT thành công.
-- [ ] Truy cập URL cần Auth bị văng ra Login nếu chưa login.
+- [x] Đăng ký, đăng nhập lấy JWT thành công.
+- [x] Truy cập URL cần Auth bị văng ra Login nếu chưa login.
 
 ### Sprint 1.2: Deck & Flashcard CRUD
 | Task | Priority | Estimated |
@@ -94,7 +100,7 @@ Cốt lõi MVP: Người dùng có thể đăng nhập, tạo, sửa, xóa các 
 | [FE] Form Create/Edit Flashcard | P0 | 4h |
 
 #### Deliverables
-- [ ] User tự thao tác vòng đời đầy đủ của Deck & Flashcard của họ.
+- [x] User tự thao tác vòng đời đầy đủ của Deck & Flashcard của họ.
 - [ ] Validate đầu vào chính xác cả backend (JPA, @Valid) lẫn Frontend.
 
 ---
@@ -121,9 +127,9 @@ Tính năng học tập chính (Lật thẻ) và lưu vết tiến độ.
 | [FE] Lọc danh sách thẻ cho Study Mode từ list DUE | P0 | 3h |
 
 #### Deliverables
-- [ ] Lật thẻ CSS mượt mà.
-- [ ] Ôn tập theo khoảng thời gian thực tế tính toán bằng thuật toán.
-- [ ] Mỗi ngày hệ thống chỉ query ra các từ "tới hạn".
+- [x] Lật thẻ CSS mượt mà.
+- [x] Ôn tập theo khoảng thời gian thực tế tính toán bằng thuật toán.
+- [x] Mỗi ngày hệ thống chỉ query ra các từ "tới hạn".
 
 ---
 
@@ -136,13 +142,17 @@ Tạo động lực học tập bằng gamification và biểu đồ thống kê
 | Task | Priority | Estimated |
 |------|----------|-----------|
 | [BE] API Sinh random câu hỏi trắc nghiệm từ Deck | P1 | 6h |
-| [FE] UI làm bài đánh giá (Quiz), chấm điểm | P1 | 6h |
+| [FE] UI làm bài đánh giá (Quiz), chấm điểm, lưu session history local | P1 | 6h |
 | [BE] API Thống kê số thẻ mới, đang học, đã thuộc | P1 | 4h |
-| [FE] UI hiển thị Biểu đồ (Charts) ở màn hình Dashboard | P1 | 4h |
+| [FE] UI hiển thị Biểu đồ (Charts) ở màn hình Statistics + gamification cơ bản | P1 | 4h |
 
 #### Deliverables
-- [ ] Tính năng Quiz random hoạt động.
-- [ ] Biểu đồ thể hiện trực quan quá trình học.
+- [x] Tính năng Quiz random hoạt động.
+- [x] Biểu đồ thể hiện trực quan quá trình học.
+
+### Ghi chú mở rộng (đã triển khai)
+- [x] Quiz report sau khi nộp bài (danh sách đúng/sai theo câu).
+- [x] Gamification foundation (points + streak + session counters) ở frontend local storage.
 
 ---
 
