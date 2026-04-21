@@ -12,12 +12,14 @@ import {
   GlobalOutlined,
   LockOutlined,
   BookOutlined,
+  QuestionCircleOutlined,
 } from '@ant-design/icons';
 import { deckService } from '@/services/deck.service.js';
 import { flashcardService } from '@/services/flashcard.service.js';
 import { useAuth } from '@/contexts/AuthContext.jsx';
 import DeckFormModal from '@/components/feature/DeckFormModal.jsx';
 import FlashcardFormModal from '@/components/feature/FlashcardFormModal.jsx';
+import './DeckDetailPage.css';
 
 const DeckDetailPage = () => {
   const { deckId } = useParams();
@@ -269,6 +271,17 @@ const DeckDetailPage = () => {
             disabled={flashcards.length === 0}
           >
             Study Now
+          </Button>
+          <Button
+            type="primary"
+            ghost
+            icon={<QuestionCircleOutlined />}
+            size="large"
+            onClick={() => navigate(`/quiz/${deckId}`)}
+            disabled={flashcards.length < 4}
+            title={flashcards.length < 4 ? "Need at least 4 cards" : ""}
+          >
+            Take Quiz
           </Button>
           {isOwner && (
             <>

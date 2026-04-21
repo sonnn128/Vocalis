@@ -12,7 +12,10 @@ import RegisterPage from '@/pages/RegisterPage.jsx';
 import DashboardPage from '@/pages/DashboardPage.jsx';
 import DeckDetailPage from '@/pages/DeckDetailPage.jsx';
 import StudyPage from '@/pages/StudyPage.jsx';
+import QuizPage from '@/pages/QuizPage.jsx';
 import ExplorePage from '@/pages/ExplorePage.jsx';
+import StudyQueuePage from '@/pages/StudyQueuePage.jsx';
+import StatisticsPage from '@/pages/StatisticsPage.jsx';
 
 const { Footer } = Layout;
 
@@ -35,8 +38,11 @@ const AppContent = () => {
           <Route path="/" element={<DashboardPage />} />
           <Route path="/dashboard" element={<Navigate to="/" replace />} />
           <Route path="/explore" element={<ExplorePage />} />
+          <Route path="/study" element={<StudyQueuePage />} />
           <Route path="/decks/:deckId" element={<DeckDetailPage />} />
           <Route path="/study/:deckId" element={<StudyPage />} />
+          <Route path="/quiz/:deckId" element={<QuizPage />} />
+          <Route path="/statistics" element={<StatisticsPage />} />
         </Route>
 
         {/* Fallback */}

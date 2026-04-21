@@ -125,7 +125,7 @@ const Navbar = () => {
           color: token.colorPrimary,
           letterSpacing: '-0.5px'
         }}>
-          Laptop Shop
+          Vocalis
         </div>
       </div>
 

@@ -138,17 +138,17 @@ const StudyPage = () => {
           <Title level={4} style={{ marginBottom: 24 }}>How well did you know this?</Title>
           <Row gutter={16} justify="center">
             <Col>
-              <Button danger size="large" style={{ width: 120 }} onClick={() => handleReview(0)}>
-                Hard / Again
+              <Button danger size="large" style={{ width: 120 }} onClick={() => handleReview(1)}>
+                Hard
               </Button>
             </Col>
             <Col>
-              <Button size="large" style={{ width: 120, borderColor: '#3b82f6', color: '#3b82f6' }} onClick={() => handleReview(3)}>
+              <Button size="large" style={{ width: 120, borderColor: '#3b82f6', color: '#3b82f6' }} onClick={() => handleReview(2)}>
                 Good
               </Button>
             </Col>
             <Col>
-              <Button type="primary" size="large" style={{ width: 120, background: '#10b981', borderColor: '#10b981' }} onClick={() => handleReview(5)}>
+              <Button type="primary" size="large" style={{ width: 120, background: '#10b981', borderColor: '#10b981' }} onClick={() => handleReview(3)}>
                 Easy
               </Button>
             </Col>

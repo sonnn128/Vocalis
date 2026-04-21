@@ -10,4 +10,8 @@ import java.util.List;
 public interface FlashcardRepository extends JpaRepository<Flashcard, String> {
 
     List<Flashcard> findByDeckId(String deckId);
+
+    List<Flashcard> findByDeckIdAndIdNotIn(String deckId, List<String> ids);
+
+    long countByDeck_User_Id(String userId);
 }

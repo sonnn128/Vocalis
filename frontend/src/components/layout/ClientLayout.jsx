@@ -6,6 +6,8 @@ import {
   PlusOutlined,
   LogoutOutlined,
   UserOutlined,
+  BarChartOutlined,
+  ReadOutlined,
 } from '@ant-design/icons';
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext.jsx';
@@ -20,6 +22,8 @@ const ClientLayout = () => {
 
   const selectedKey = React.useMemo(() => {
     if (location.pathname.startsWith('/explore')) return '/explore';
+    if (location.pathname.startsWith('/study')) return '/study';
+    if (location.pathname.startsWith('/statistics')) return '/statistics';
     return '/';
   }, [location.pathname]);
 
@@ -114,6 +118,18 @@ const ClientLayout = () => {
               icon: <GlobalOutlined />,
               label: 'Explore',
               onClick: () => navigate('/explore'),
+            },
+            {
+              key: '/study',
+              icon: <ReadOutlined />,
+              label: 'Study Queue',
+              onClick: () => navigate('/study'),
+            },
+            {
+              key: '/statistics',
+              icon: <BarChartOutlined />,
+              label: 'Statistics',
+              onClick: () => navigate('/statistics'),
             },
           ]}
         />

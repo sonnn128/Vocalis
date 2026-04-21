@@ -12,4 +12,6 @@ public interface DeckRepository extends JpaRepository<Deck, String> {
     Page<Deck> findByUserId(String userId, Pageable pageable);
 
     Page<Deck> findByIsPublicTrue(Pageable pageable);
+
+    long countByUserId(String userId);
 }
